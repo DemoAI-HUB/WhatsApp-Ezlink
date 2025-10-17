@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EZLink @WhatsApp Dashboard</title>
+  <meta name="description" content="Generate WhatsApp links with custom messages, QR codes, and UTM tracking." />
+  <link rel="icon" href="/favicon.ico" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+
+<body class="bg-gray-100 font-sans text-gray-800">
+  <main class="min-h-screen flex flex-col items-center justify-center py-12 px-4">
+    <h2 class="text-3xl font-bold text-green-700 text-center -mt-4 mb-8">Create Your WhatsApp Link Now</h2>
+    <p class="text-sm text-gray-400 -mt-6 mb-4">Powered by © Ezlink.now</p>
+    
+    <!-- Bulk Create Container -->
+    <div id="bulkCreateWrapper" class="w-full max-w-5xl px-4 sm:px-6 lg:px-8">
+      
+    <!-- Bulk Create Toggle -->
+<button id="bulkToggle" type="button"
+  class="text-sm text-blue-600 hover:underline flex items-center gap-2 mt-3 -mb-1 justify-start">
+  
+  <!-- Upload Icon -->
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24"
+    stroke="currentColor" aria-hidden="true">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+      d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 12v8m0-8l-3 3m3-3l3 3M12 4v4m0-4l-3 3m3-3l3 3" />
+  </svg>
+  <span class="font-semibold">Bulk Create</span>
+</button>
+    
+    <!-- Bulk Create Section -->
+    <div id="bulkSection" data-collapsible class="mb-3 overflow-hidden max-h-0 transition-all duration-300">
+      
+  <!-- CSV 上传区域放这里 -->
+      <div class="mt-4">
+  <label class="block text-gray-700 font-semibold mb-1">Upload CSV File</label>
+        
+        <!-- 下载模板按钮 -->
+        <button id="downloadTemplateBtn"
+  class="text-sm text-green-600 underline hover:text-green-800 mb-2 inline-flex items-center gap-2">
+          
+  <!-- Icon -->
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24"
+    stroke="currentColor" aria-hidden="true">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+      d="M4 4v16h16V4H4zm4 8h8m-4-4v8" />
+  </svg>
+  Download CSV Template
+</button>
+        
+        <!-- 上传文件 -->
+  <input type="file" id="csvUpload" accept=".csv,text/csv" /
+    class="w-full px-4 py-2 border rounded bg-gray-50 mt-1 mb-2 focus:outline-none focus:ring-2 focus:ring-green-400" />
+</div>
+</div>
+    
+    <!-- Bulk Create Result Section -->
+    <div id="bulkResults" class="mt-6 hidden">
+  <h3 class="text-lg font-semibold text-green-700 text-left -mt-4 mb-2 text-left">Bulk Results</h3>
+  <div id="bulkTableContainer" class="overflow-x-auto"></div>
+      
+      <!-- 导出按钮 -->
+      <div class="mt-3 flex justify-end">
+      <button id="exportCSV"
+  class="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 mt-1 mb-8 w-full sm:w-auto hidden">
+  Export Results as CSV
+</button>
+</div>
+</div>
+      </div>
+      
+      <!-- 外层容器 -->
+<div class="flex flex-col w-full max-w-5xl mx-auto">
+
+  <!-- ✅ 横向布局：表单 + 标题 + 预览 -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:gap-6 w-full">
+    
+    <!-- Form Section -->
+  <!-- 左侧：表单 -->
+  <div class="flex-1 sm:w-[65%] sm:self-start">
+    <section class="bg-white rounded-lg shadow-md p-5 w-full max-w-2xl mx-auto">
+      <form id="wa-form" novalidate>
+        
+        <!-- Phone Input Area-->
+       <div class="mb-5">
+  <label for="phoneInput" class="block text-gray-700 mt-1 mb-3 font-semibold phone-label">
+    WhatsApp Phone Number
+    <span class="tooltip-icon" title="Enter phone number without country code"> * </span>
+  </label>
+
+  <div class="flex rounded-md shadow-sm overflow-hidden border focus-within:ring-2 focus-within:ring-green-500">
+    <!-- Country code selector -->
+    <label for="countryCode" class="sr-only">Country Code</label>
+    <select id="countryCode" name="countryCode"
+      class="bg-white text-sm px-2 py-2 border-r focus:outline-none">
+      <option value="+60">🇲🇾 +60</option>
+      <option value="+65">🇸🇬 +65</option>
+      <option value="+1">🇺🇸 +1</option>
+      <option value="+44">🇬🇧 +44</option>
+      <!-- 可继续扩展 -->
+    </select>
+
+    <!-- Phone number input -->
+    <input id="phoneInput" name="phone" type="tel" required placeholder="e.g. 123456789"
+      class="flex-1 px-4 py-2 text-lg focus:outline-none bg-gray-100" />
+  </div>
+
+  <p class="text-sm text-gray-500 mt-2">Remember to check your number.</p>
+</div>
+
+        <!-- Message Input -->
+        <div>
+          <label for="message" class="block text-gray-700 mb-2 font-semibold">Custom Message
+            <span class="tooltip-icon" title="Enter message that you want to send / receive."> * </span>
+          </label>
+          <textarea id="message" name="message" rows="3" required placeholder="Enter custom message that want to be send..."
+            class="w-full px-4 py-5 border rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-400"></textarea>
+          <p class="text-sm text-gray-500 mt-1 mb-5">Example: Hello, I want to know more about this product.</p>
+        </div>
+
+        <!-- Advanced Settings Toggle -->
+        <button id="advancedToggle" type="button"
+          class="text-sm text-blue-600 hover:underline flex mb-2 items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+          Advanced Settings
+        </button>
+
+        <!-- Advanced Settings Content -->
+        <div id="advancedSettings" data-collapsible class="mb-3 overflow-hidden max-h-0 transition-all duration-300">
+          <div class="space-y-4">
+            
+            <!-- UTM Campaign -->
+            <div>
+              <label for="utm" class="block text-gray-700 mt-3 mb-2 font-semibold">UTM Campaign (optional)</label>
+              <input type="text" id="utm" name="utm" placeholder="Campaign ID (e.g., facebook-ad-promo)"
+                class="w-full px-4 py-3 border rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-400" />
+              <small class="text-gray-500 mt-2 block">Add Campaign ID to track your traffic. </small>
+              <small class="text-gray-500 block">Learn more about <a href="https://www.google.com/analytics/learn/utm_parameters"
+                  target="_blank" class="text-blue-500 underline">UTM parameters here</a>.</small>
+            </div>
+
+            <!-- Include Page Info -->
+            <div>
+              <label class="flex items-center gap-2">
+                <input type="checkbox" id="includePageInfo" name="includePageInfo" class="rounded text-green-600 mt-1 mb-3" />
+                <span class="text-sm text-gray-700 mt-1 mb-3">Include page info in message</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit"
+          class="bg-green-700 text-white px-6 py-2 rounded hover:bg-green-800 transition-all w-full">
+          Create EzLink @WhatsApp
+        </button>
+        
+        <!-- Result Section -->
+      <hr class="my-5" aria-hidden="true" />
+      <div id="result" class="mt-6 hidden">
+        <div class="flex items-center gap-2 mb-4">
+          <input id="wa-link" type="text" readonly class="flex-1 px-4 py-2 border rounded bg-gray-100 text-sm h-10" />
+          <button id="share-button" type="button"
+            class="h-10 w-10 flex items-center justify-center rounded-md border border-gray-300 hover:bg-gray-100 text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"
+              aria-hidden="true">
+              <path
+                d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7a2.5 2.5 0 000-1.4l7.05-4.11a2.5 2.5 0 10-.9-1.45l-7.05 4.11a2.5 2.5 0 100 3.9l7.05 4.11a2.5 2.5 0 101.94-1.78z" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3 justify-end">
+          <button id="copy-button" type="button"
+            class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-full sm:w-auto">Copy Link</button>
+          <button id="generate-qr-button" type="button"
+            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full sm:w-auto">Generate QR Code</button>
+        </div>
+      </div>
+      </form>
+      </section>
+    
+    </div>
+
+    <!-- ✅ 中间标题：响应式排版 + 垂直居中 -->
+<div class="w-full sm:w-auto sm:h-full sm:flex sm:flex-col sm:justify-center items-center my-4 sm:my-0">
+  <h3 class="text-lg font-semibold text-gray-700 mt-3 mb-1 text-center leading-snug">
+    <!-- ✅ 手机：一行 -->
+    <span class="block sm:hidden">Message Preview</span>
+
+    <!-- ✅ 桌面：两行 -->
+    <span class="hidden sm:block">Message</span>
+    <span class="hidden sm:block">Preview</span>
+  </h3>
+</div>
+
+    <!-- ✅ 右侧：Preview Area -->
+    <div class="sm:w-[35%] flex flex-col items-center justify-center">
+
+      <!-- ✅ preview 手机框 -->
+      <div class="w-full flex justify-center">
+        <div class="w-[320px] h-[480px] bg-black rounded-[2rem] shadow-xl p-1 flex flex-col items-center justify-start">
+          <div class="bg-[#ece5dd] w-full h-full rounded-[1.5rem] overflow-hidden flex flex-col justify-between p-3">
+
+            <!-- 顶部：联系人 -->
+            <div class="flex items-center gap-2 mb-2">
+              <img src="https://i.imgur.com/0y0y0y0.png" class="w-7 h-7 rounded-full" alt="Avatar" />
+              <span id="previewContact" class="text-md font-semibold text-gray-800">+60 xx xxxxx</span>
+              <span class="text-xs text-gray-500 ml-auto">Online</span>
+            </div>
+
+            <!-- 聊天内容 -->
+            <div class="flex-1 flex flex-col justify-end">
+              <div class="flex justify-end mb-1">
+                <div id="previewBubble"
+                  class="bg-[#dcf8c6] text-gray-900 p-3 rounded-xl rounded-br-sm whitespace-pre-line text-sm shadow-sm max-w-[85%]">Your message preview will appear here.
+                </div>
+              </div>
+              <div class="text-right text-xs text-gray-500">14:38</div>
+            </div>
+
+            <!-- 底部：模拟输入框 -->
+            <div class="mt-2 flex items-center gap-2 bg-white rounded-full px-3 py-2 shadow-sm border border-gray-300">
+              <span class="text-gray-500 text-sm italic">Type a message...</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 ml-auto" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M14.752 11.168l-4.586-4.586a1 1 0 00-1.414 1.414L12.586 12l-3.834 3.834a1 1 0 001.414 1.414l4.586-4.586a1 1 0 000-1.414z" />
+              </svg>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ✅ Open in WhatsApp 按钮 -->
+<button class="text-blue-600 underline text-sm hover:text-blue-800"
+  onclick="openWhatsAppFromLink()">
+  Open in WhatsApp
+</button>
+
+<script>
+  let linkGenerated = false;
+
+  // ✅ 页面加载完成后再绑定事件
+  window.addEventListener('DOMContentLoaded', () => {
+    // ✅ 每次点击 Create 按钮时，设置为 true
+    document.getElementById('wa-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      // 你的生成链接逻辑...
+      // 假设你生成完后设置 wa-link 的值
+      linkGenerated = true;
+      document.getElementById('result').classList.remove('hidden');
+    });
+
+    // ✅ 每次用户修改表单字段时，设置为 false
+    ['phoneInput', 'message', 'countryCode', 'utm', 'includePageInfo'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', () => linkGenerated = false);
+        el.addEventListener('change', () => linkGenerated = false);
+      }
+    });
+  });
+
+  // ✅ Open in WhatsApp 按钮逻辑
+  function openWhatsAppFromLink() {
+    if (!linkGenerated) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Link not created yet',
+        text: 'Please click "Create EzLink @WhatsApp" first to open your link in WhatsApp.',
+        confirmButtonColor: '#3085d6',
+      });
+      return;
+    }
+
+    const waLink = document.getElementById('wa-link').value.trim();
+    if (!waLink) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Missing link',
+        text: 'Something went wrong. Please try generating the link again.',
+        confirmButtonColor: '#d33',
+      });
+      return;
+    }
+
+    window.open(waLink, '_blank');
+  }
+</script>
+
+      
+    </div>
+  </div>
+
+  <!-- ✅ Export Tools Section -->
+  <section id="export-tools" class="mt-8 bg-white rounded-lg shadow-md p-6 w-full max-w-2xl mx-auto text-center hidden">
+    <h2 class="text-xl font-semibold text-green-700 mb-2">Your QR Code Here</h2>
+    <div class="mb-6">
+      <canvas id="qrCanvas" class="mx-auto" role="img" aria-label="Generated QR Code"></canvas>
+      <button id="downloadQR" class="mt-1 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+        Download QR Code
+      </button>
+    </div>
+    <div class="space-y-2">
+      <button id="generateShortLink" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4">
+        Generate Short Link
+      </button>
+    </div>
+  </section>
+
+</div>
+
+
+    </section>
+  
+  </main>
+
+  <!-- FAQ Section (separated from main) -->
+  <section class="bg-white text-gray-900 py-10 px-4">
+    <div class="max-w-5xl mx-auto">
+      <h2 class="text-3xl font-bold mb-8 text-center">Frequently Asked Questions</h2>
+      <div class="space-y-6">
+        <!-- FAQ items go here (use data-collapsible on .faq-content) -->
+        <!-- See previous message for full FAQ block -->
+        <!-- FAQ Item 1 -->
+  <div class="border-b border-gray-300 pb-2">
+    <button class="faq-button flex justify-between items-center w-full py-2 text-left">
+      <span class="font-semibold text-lg">What is a WhatsApp link?</span>
+      <svg class="w-5 h-5 text-gray-600 transition-transform duration-200" fill="none" stroke="currentColor"
+        viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
+    <div class="faq-content mt-2 mb-2 text-gray-700" data-collapsible>
+      <p>WhatsApp links (also called click-to-chat URLs) allow people to message you directly on WhatsApp. </p>
+    </div>
+  </div>
+
+  <!-- FAQ Item 2 -->
+  <div class="border-b border-gray-300 pb-2">
+    <button class="faq-button flex justify-between items-center w-full py-2 text-left">
+      <span class="font-semibold text-lg">How do I use the generated link?</span>
+      <svg class="w-5 h-5 text-gray-600 transition-transform duration-200" fill="none" stroke="currentColor"
+        viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
+    <div class="faq-content mt-2 mb-2 text-gray-700" data-collapsible>
+      <p>You can share your WhatsApp link to anywhere — Social media, story, post, website, flyers, business cards, anywhere.</p>
+    </div>
+  </div>
+
+  <!-- FAQ Item 3 -->
+  <div class="border-b border-gray-300 pb-2">
+    <button class="faq-button flex justify-between items-center w-full py-2 text-left">
+      <span class="font-semibold text-lg">Why should I use UTM parameters?</span>
+      <svg class="w-5 h-5 text-gray-600 transition-transform duration-200" fill="none" stroke="currentColor"
+        viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
+    <div class="faq-content mt-2 mb-2 text-gray-700" data-collapsible>
+      <p>UTM parameters help you track where your traffic is coming from using tools like Google Analytics.</p>
+    </div>
+  </div>
+
+  <!-- FAQ Item 4 -->
+  <div class="border-b border-gray-300 pb-2">
+    <button class="faq-button flex justify-between items-center w-full py-2 text-left">
+      <span class="font-semibold text-lg">Is this service free?</span>
+      <svg class="w-5 h-5 text-gray-600 transition-transform duration-200" fill="none" stroke="currentColor"
+        viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
+    <div class="faq-content mt-2 mb-2 text-gray-700" data-collapsible>
+      <p>Our WhatsApp link generator is 100% free to use. Meanwhile, We also provide paid plan for better analytics insight.</p>
+    </div>
+  </div>
+</div>
+      </div>
+
+      <!-- Footer -->
+      <div class="mt-8 -mb-2 text-center text-sm text-gray-600 space-y-2">
+        <p>
+          For more information, visit this
+          <a href="https://wa.me/60182885950?text=Hi%2C%20I%20would%20like%20to%20know%20more%20about%20Ezlink%20%40WhatsApp." target="_blank" class="text-green-600 underline hover:text-green-800">resource</a>.
+        </p>
+        <p>© 2025 Ezlink.now. All rights reserved.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- JS Script -->
+  <script src="script.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</body>
+</html>

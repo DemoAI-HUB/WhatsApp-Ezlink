@@ -1,0 +1,17 @@
+@keyframes pulseError {
+  0% { box-shadow: 0 0 0px red; }
+  50% { box-shadow: 0 0 8px red; }
+  100% { box-shadow: 0 0 0px red; }
+}
+
+.input-error {
+  animation: pulseError 0.2s ease-in-out 0s 2; /* 播放2次 */
+  border-color: red;
+}
+
+.input-error {
+  animation: pulseError 0.2s ease-in-out 0s 2;
+  border-color: red;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.3);
+}
