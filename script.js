@@ -445,6 +445,7 @@ if (openBtn) openBtn.classList.remove('hidden');
           if (isMobile) {
             document.getElementById('result')?.scrollIntoView({ behavior: 'smooth' });
   }
+  }
 });
       
     } catch (err) {
@@ -813,3 +814,4 @@ if (openBtn) openBtn.classList.remove('hidden');
   });
 
 });
+
