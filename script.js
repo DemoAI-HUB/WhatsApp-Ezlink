@@ -443,12 +443,10 @@ if (openBtn) openBtn.classList.remove('hidden');
         didClose: () => {
           const isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
           if (isMobile) {
-            setTimeout(() => {
-              window.scrollBy({ top: 100, behavior: 'smooth' });
-            }, 100);
-          }
-        }
-      });
+            document.getElementById('result')?.scrollIntoView({ behavior: 'smooth' });
+  }
+});
+      
     } catch (err) {
       console.error('Short link error:', err);
       Swal.fire({
@@ -813,4 +811,5 @@ if (openBtn) openBtn.classList.remove('hidden');
       showConfirmButton: false
     });
   });
+
 });
