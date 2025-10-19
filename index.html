@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EZLink @WhatsApp Dashboard</title>
+  <title>EzLink @ WhatsApp</title>
   <meta name="description" content="Generate WhatsApp links with custom messages, QR codes, and UTM tracking." />
   <link rel="icon" href="/favicon.ico" />
   <script src="https://cdn.tailwindcss.com"></script>
@@ -165,17 +165,9 @@
               <input type="text" id="utm" name="utm" placeholder="Campaign ID (e.g., facebook-ad-promo)"
                 class="w-full px-4 py-2 border rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-400" />
               <small class="text-gray-500 mt-2 block">Add Campaign ID to track your traffic. </small>
-              <small class="text-gray-500 block">Learn more about <a href="https://www.google.com/analytics/learn/utm_parameters"
-                  target="_blank" class="text-blue-500 underline">UTM parameters here</a>.</small>
+              
             </div>
-
-            <!-- Include Page Info -->
-            <div>
-              <label class="flex items-center gap-2">
-                <input type="checkbox" id="includePageInfo" name="includePageInfo" class="rounded text-green-600 mt-1 mb-3" />
-                <span class="text-sm text-gray-700 mt-1 mb-3">Include page info in message</span>
-              </label>
-            </div>
+            
           </div>
         </div>
 
@@ -283,11 +275,6 @@
         Download QR Code
       </button>
     </div>
-    <div class="space-y-2">
-      <button id="generateShortLink" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4">
-        Generate Short Link
-      </button>
-    </div>
   </section>
 </div>
 
@@ -376,4 +363,5 @@
   <script src="script.js"></script>
   <link rel="stylesheet" href="style.css" />
 </body>
+
 </html>
