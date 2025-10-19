@@ -443,7 +443,10 @@ if (openBtn) openBtn.classList.remove('hidden');
         didClose: () => {
           const isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
           if (isMobile) {
-            document.getElementById('result')?.scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('result')?.scrollIntoView({
+  behavior: 'smooth',
+  block: 'end'
+});
   }
   }
 });
@@ -814,4 +817,5 @@ if (openBtn) openBtn.classList.remove('hidden');
   });
 
 });
+
 
