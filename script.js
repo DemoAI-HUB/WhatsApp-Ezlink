@@ -443,13 +443,12 @@ if (openBtn) openBtn.classList.remove('hidden');
         didClose: () => {
           const isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
           if (isMobile) {
-            document.getElementById('result')?.scrollIntoView({
-  behavior: 'smooth',
-  block: 'center'
-});
-  }
-  }
-});
+            setTimeout(() => {
+              window.scrollBy({ top: 150, behavior: 'smooth' });
+            }, 100);
+          }
+        }
+      });
       
     } catch (err) {
       console.error('Short link error:', err);
@@ -817,6 +816,7 @@ if (openBtn) openBtn.classList.remove('hidden');
   });
 
 });
+
 
 
 
