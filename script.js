@@ -441,13 +441,10 @@ if (openBtn) openBtn.classList.remove('hidden');
         timer: 2000,
         showConfirmButton: false,
         didClose: () => {
-  const isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
-  if (isMobile) {
     document.getElementById('result')?.scrollIntoView({
       behavior: 'smooth',
       block: 'center'
     });
-  }
   }
   });
 
@@ -782,7 +779,7 @@ if (openBtn) openBtn.classList.remove('hidden');
   exportCSVBtn.addEventListener('click', () => {
     if (!bulkData.length) return;
 
-    const headers = ['Phone', 'Message', 'Status', 'Short Link', 'Remark'];
+    const headers = ['#','Phone', 'Message', 'Status', 'Short Link', 'Remark'];
     const rows = bulkData.map((row, index) => [
       index + 1,
       row.phone,
@@ -801,7 +798,8 @@ if (openBtn) openBtn.classList.remove('hidden');
 
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', 'ezlink-bulk-create-WA-results.csv');
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+link.setAttribute('download', `ezlinknow-bulk-results-${timestamp}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
