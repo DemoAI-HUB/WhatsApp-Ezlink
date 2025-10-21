@@ -459,6 +459,47 @@ if (openBtn) openBtn.classList.remove('hidden');
       });
     }
   });
+
+    // 国家码映射表（可扩展）
+const countryOptions = [
+  { code: 'MY', dial: '+60', label: '🇲🇾 +60' },
+  { code: 'SG', dial: '+65', label: '🇸🇬 +65' },
+  { code: 'US', dial: '+1', label: '🇺🇸 +1' },
+  { code: 'GB', dial: '+44', label: '🇬🇧 +44' },
+  // 更多国家可按需添加
+];
+
+// 自动设置国家码
+function autoSetCountryCode() {
+  fetch('https://ipapi.co/json/')
+    .then(response => response.json())
+    .then(data => {
+      const countryCode = data.country; // e.g. "MY"
+      const match = countryOptions.find(opt => opt.code === countryCode);
+      const dialCode = match ? match.dial : '+60';
+      const select = document.querySelector('#countryCode');
+      if (select) select.value = dialCode;
+    })
+    .catch(() => {
+      const select = document.querySelector('#countryCode');
+      if (select) select.value = '+60'; // fallback
+    });
+}
+
+// 初始化国家码下拉框（可选：自动生成 <option>）
+function renderCountryOptions() {
+  const select = document.querySelector('#countryCode');
+  if (!select) return;
+  select.innerHTML = countryOptions.map(opt =>
+    `<option value="${opt.dial}">${opt.label}</option>`
+  ).join('');
+}
+
+// 页面加载后执行
+document.addEventListener('DOMContentLoaded', () => {
+  renderCountryOptions();       // 可选：自动生成下拉选项
+  autoSetCountryCode();         // 自动识别并设置默认国家码
+});
   
   // 👉open in WhatsApp按钮逻辑
   function openWhatsAppFromLink() {
@@ -814,3 +855,4 @@ link.setAttribute('download', `ezlinknow-bulk-results-${timestamp}.csv`);
     });
   });
 });
+
